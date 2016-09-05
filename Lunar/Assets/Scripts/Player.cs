@@ -21,12 +21,22 @@ public class Player : MonoBehaviour {
 
     //Constant Variables
     private const float MAX_FORCE = 10.0f;
+    private const float MAX_TORQUE = 1.0f;
+    private const float MAX_ANGLE = 25.0f;
 
     //Variables
     private Vector2 currentForce = Vector2.zero;
-    private float pushRate = 0.5f;
+    private Vector3 currentTorque = Vector3.zero;
+    private float pushRate = 0.05f;
+    private float turnRate = 0.05f;
     private float boostRate = 0.25f;
-    private bool isMoving = false;
+    private float currentRotation = 0.0f;
+    private bool isMovingUpwards = false;
+    private bool isRotating = false;
+
+
+    //TODO: Limit Z rotation so you can't tip over?
+
 
     void Start()
     {
@@ -37,15 +47,16 @@ public class Player : MonoBehaviour {
     {
         HandleInput();
         HandleMovement();
+        HandleParticles();
     }
 
-    void ShowParticles()
+    void HandleParticles()
     {
-        if(currentForce.x < 0)
+        if(currentTorque.z > 0)
         {
             fireRight.Play();
         }
-        if(currentForce.x > 0)
+        if(currentTorque.z < 0)
         {
             fireLeft.Play();
         }
@@ -53,24 +64,34 @@ public class Player : MonoBehaviour {
         {
             fireUp.Play();
         }
+
+        if(!isMovingUpwards)
+        {
+            if (fireUp.isPlaying)
+            {
+                fireUp.Stop();
+            }
+        }
+        if (!isRotating)
+        {
+            if (fireRight.isPlaying || fireLeft.isPlaying)
+            {
+                fireRight.Stop();
+                fireLeft.Stop();
+            }
+        }
+
     }
 
     void HandleMovement()
     {
         if (currentForce != Vector2.zero)
         {
-            Debug.Log("Adding Force: " + currentForce.ToString());
             rb.AddForce(currentForce);
-            ShowParticles();
         }
-        else
+        if(currentTorque != Vector3.zero)
         {
-            if(fireRight.isPlaying || fireLeft.isPlaying || fireUp.isPlaying)
-            {
-                fireRight.Stop();
-                fireLeft.Stop();
-                fireUp.Stop();
-            }
+            rb.AddTorque(currentTorque, ForceMode.Force);
         }
     }
 
@@ -78,37 +99,42 @@ public class Player : MonoBehaviour {
     {
         if (Input.GetKey(LEFT_KEY))
         {
+            currentTorque.z += turnRate;
             currentForce.x -= pushRate;
+            isRotating = true;
         }
         if (Input.GetKey(RIGHT_KEY))
         {
+            currentTorque.z -= turnRate;
             currentForce.x += pushRate;
+            isRotating = true;
         }
+
 
         if (Input.GetKeyUp(LEFT_KEY) || Input.GetKeyUp(RIGHT_KEY))
         {
+            currentTorque.z = 0;
             currentForce.x = 0;
-            isMoving = false;
+            isRotating = false;
         }
      
 
         if (Input.GetKey(UP_KEY))
         {
             currentForce.y += boostRate;
+            isMovingUpwards = true;
         }
 
         if (Input.GetKeyUp(UP_KEY))
         {
             currentForce.y = 0;
-            isMoving = false;
+            isMovingUpwards = false;
         }
 
         currentForce.x = Mathf.Clamp(currentForce.x, -MAX_FORCE, MAX_FORCE);
         currentForce.y = Mathf.Clamp(currentForce.y, -MAX_FORCE, MAX_FORCE);
 
-        if (Input.GetKey(LEFT_KEY) || Input.GetKey(RIGHT_KEY) || Input.GetKey(UP_KEY))
-        {
-            isMoving = true;
-        }
+        currentTorque.z = Mathf.Clamp(currentTorque.z, -MAX_TORQUE, MAX_TORQUE);
+
     }
 }
