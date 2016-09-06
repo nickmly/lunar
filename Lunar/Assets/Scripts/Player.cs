@@ -28,7 +28,7 @@ public class Player : MonoBehaviour {
     private Vector2 currentForce = Vector2.zero;
     private Vector3 currentTorque = Vector3.zero;
     private float pushRate = 0.05f;
-    private float turnRate = 0.05f;
+    private float turnRate = 0.025f;
     private float boostRate = 0.25f;
     private float currentRotation = 0.0f;
     private bool isMovingUpwards = false;
@@ -87,7 +87,7 @@ public class Player : MonoBehaviour {
     {
         if (currentForce != Vector2.zero)
         {
-            rb.AddForce(currentForce);
+			rb.AddRelativeForce(currentForce, ForceMode.Acceleration);
         }
         if(currentTorque != Vector3.zero)
         {
@@ -100,13 +100,13 @@ public class Player : MonoBehaviour {
         if (Input.GetKey(LEFT_KEY))
         {
             currentTorque.z += turnRate;
-            currentForce.x -= pushRate;
+            //currentForce.x -= pushRate;
             isRotating = true;
         }
         if (Input.GetKey(RIGHT_KEY))
         {
             currentTorque.z -= turnRate;
-            currentForce.x += pushRate;
+           // currentForce.x += pushRate;
             isRotating = true;
         }
 
@@ -121,8 +121,9 @@ public class Player : MonoBehaviour {
 
         if (Input.GetKey(UP_KEY))
         {
-            currentForce.y += boostRate;
+			currentForce.y += boostRate;
             isMovingUpwards = true;
+
         }
 
         if (Input.GetKeyUp(UP_KEY))
@@ -133,7 +134,6 @@ public class Player : MonoBehaviour {
 
         currentForce.x = Mathf.Clamp(currentForce.x, -MAX_FORCE, MAX_FORCE);
         currentForce.y = Mathf.Clamp(currentForce.y, -MAX_FORCE, MAX_FORCE);
-
         currentTorque.z = Mathf.Clamp(currentTorque.z, -MAX_TORQUE, MAX_TORQUE);
 
     }
