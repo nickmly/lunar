@@ -29,7 +29,7 @@ public class Player : MonoBehaviour {
     private Vector3 currentTorque = Vector3.zero;
     private float pushRate = 0.05f;
     private float turnRate = 0.025f;
-    private float boostRate = 0.25f;
+    private float boostRate = 0.15f;
     private float currentRotation = 0.0f;
     private bool isMovingUpwards = false;
     private bool isRotating = false;
@@ -41,6 +41,8 @@ public class Player : MonoBehaviour {
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+		rb.maxAngularVelocity = 2.0f;
+		rb.maxDepenetrationVelocity = 10.0f;
     }
 
     void Update()
@@ -93,6 +95,9 @@ public class Player : MonoBehaviour {
         {
             rb.AddTorque(currentTorque, ForceMode.Force);
         }
+		if(rb.velocity.magnitude > 4.0f) {
+			rb.AddForce(-rb.velocity);
+		}
     }
 
     void HandleInput()
