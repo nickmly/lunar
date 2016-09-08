@@ -27,8 +27,6 @@ public class SmoothFollow : MonoBehaviour
 			if(final.x > outOfBoundsLeft && final.x < outOfBoundsRight) {
 				if(final.y < 0) {
 					transform.position = new Vector3(final.x, 0, -75.0f);
-				} else if(final.y > 2.5f) {
-					transform.position = new Vector3(final.x, 2.5f, -75.0f);
 				} else {
 					transform.position = new Vector3(final.x, final.y, -75.0f);
 				}
