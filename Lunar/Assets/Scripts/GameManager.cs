@@ -57,7 +57,7 @@ public class GameManager : MonoBehaviour {
 		planets[1].cloudColor = new Color(0.74f,0.32f,0, 0.7f);
 		planets[1].skyParticleColor = new Color(1, 0, 0);
 		planets[1].mountainColor = new Color(1, 0.18f, 0);
-		planets[1].groundColor = new Color(0, 0.35f, 0.21f);
+		planets[1].groundColor = new Color(1, 0.35f, 0.05f);
 		planets[1].vignetteColor = new Color(0, 0.16f, 0.13f);
 		planets[1].backgroundColor = new Color(1, 0.93f, 0.69f);
 
@@ -84,6 +84,6 @@ public class GameManager : MonoBehaviour {
 		mountainMaterial.color = planets[a].mountainColor;
 		cL.material.color = planets[a].cloudColor;
 		clouds.startColor = planets[a].cloudColor;
-		planetBackground.color = planets[a].groundColor;
+		planetBackground.material.color = planets[a].groundColor;
 	}
 }

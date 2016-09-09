@@ -54,15 +54,15 @@ public class Player : MonoBehaviour {
 
     void HandleParticles()
     {
-        if(currentTorque.z > 0)
+		if(currentTorque.z > 0 && !fireRight.isPlaying)
         {
             fireRight.Play();
         }
-        if(currentTorque.z < 0)
+		if(currentTorque.z < 0 && !fireLeft.isPlaying)
         {
             fireLeft.Play();
         }
-        if(currentForce.y > 0)
+		if(currentForce.y > 0 && !fireUp.isPlaying)
         {
             fireUp.Play();
         }
@@ -128,7 +128,6 @@ public class Player : MonoBehaviour {
         {
 			currentForce.y += boostRate;
             isMovingUpwards = true;
-
         }
 
         if (Input.GetKeyUp(UP_KEY))
