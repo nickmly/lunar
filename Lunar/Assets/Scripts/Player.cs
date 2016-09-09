@@ -54,15 +54,15 @@ public class Player : MonoBehaviour {
 
     void HandleParticles()
     {
-		if(currentTorque.z > 0 && !fireRight.isPlaying)
+        if(currentTorque.z > 0)
         {
             fireRight.Play();
         }
-		if(currentTorque.z < 0 && !fireLeft.isPlaying)
+        if(currentTorque.z < 0)
         {
             fireLeft.Play();
         }
-		if(currentForce.y > 0 && !fireUp.isPlaying)
+        if(currentForce.y > 0)
         {
             fireUp.Play();
         }
