@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour {
 		public Color mountainColor;
 		public Color backgroundColor;
 		public Color vignetteColor;
+		public string planetSprite;
 		public Material skyParticles;
 		public int gravity;
 		public int radius;
@@ -22,12 +23,13 @@ public class GameManager : MonoBehaviour {
 	public float playerHeight = 0.0f;
 	public SpriteRenderer vignette;
 	public SpriteRenderer backGroundColor;
+	public SpriteRenderer planet;
+	public SpriteRenderer planetBackground;
 	public ParticleSystem skyParticle;
 	public ParticleSystem clouds;
 	public ParticleSystemRenderer sP;
 	public ParticleSystemRenderer cL;
 	public Material mountainMaterial;
-	public SpriteRenderer planetBackground;
 	public Player player;
 	public float currentPlanetRadius;
 
@@ -44,9 +46,10 @@ public class GameManager : MonoBehaviour {
 		planets[0].cloudColor = new Color(1,1,1);
 		planets[0].skyParticleColor = new Color(1, 1, 1);
 		planets[0].mountainColor = new Color(1, 0.55f, 0);
-		planets[0].groundColor = new Color(0, 0.22f, 0.35f);
+		planets[0].groundColor = new Color(0.2f, 0.7f, 0.0f);
 		planets[0].vignetteColor = new Color(0, 0.42f, 0.63f);
-		planets[0].backgroundColor = new Color(0, 0.32f, 0.53f);
+		planets[0].backgroundColor = new Color(0, 0.35f, .67f);
+		planets[0].planetSprite = "Earth_2";
 
 		planets[1] = new Planet();
 		planets[1].distance = 1500;
@@ -60,6 +63,7 @@ public class GameManager : MonoBehaviour {
 		planets[1].groundColor = new Color(1, 0.35f, 0.05f);
 		planets[1].vignetteColor = new Color(0, 0.16f, 0.13f);
 		planets[1].backgroundColor = new Color(1, 0.93f, 0.69f);
+		planets[1].planetSprite = "Earth_1";
 
 	
 
@@ -85,5 +89,6 @@ public class GameManager : MonoBehaviour {
 		cL.material.color = planets[a].cloudColor;
 		clouds.startColor = planets[a].cloudColor;
 		planetBackground.material.color = planets[a].groundColor;
+		planet.sprite = (Sprite)Resources.Load<Sprite>("Sprites/"+planets[a].planetSprite);
 	}
 }
