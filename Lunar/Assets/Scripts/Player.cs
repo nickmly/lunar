@@ -24,7 +24,7 @@ public class Player : MonoBehaviour
     private const float MAX_FORCE = 10.0f;
     private const float MAX_TORQUE = 1.0f;
     private const float MAX_ANGLE = 25.0f;
-    private const float RAYCAST_LANDING_RANGE = 1.5f;
+    private const float RAYCAST_LANDING_RANGE = 1.2f;
 
     //Variables
     private Vector2 currentForce = Vector2.zero;
@@ -37,8 +37,11 @@ public class Player : MonoBehaviour
     private bool isRotating = false;
     private bool landed = false;
 
-    //TODO: Lerp rotation when you land so it doesn't look so choppy
-
+    //Lerping
+    private float timeTakenToLerp,timeStartedLerping;
+    private Quaternion lerpStartRot, lerpEndRot;
+    private bool isLerping = false;
+    
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -51,6 +54,40 @@ public class Player : MonoBehaviour
         HandleInput();
         HandleMovement();
         HandleParticles();
+    }
+
+    void FixedUpdate()
+    {
+        if (isLerping)
+            Lerp();
+    }
+
+    void StartLerping(Quaternion endRot, float lerpTime)
+    {
+        timeTakenToLerp = lerpTime;
+        lerpStartRot = transform.rotation;
+        lerpEndRot = endRot;
+
+        timeStartedLerping = Time.time;
+        isLerping = true;
+    }
+
+
+    void EndLerp()
+    {
+        rb.freezeRotation = true;
+    }
+
+    void Lerp()
+    {
+        float timeSinceStarted = Time.time - timeStartedLerping;
+        float percentageComplete = timeSinceStarted / timeTakenToLerp;
+        transform.rotation = Quaternion.Lerp(lerpStartRot, lerpEndRot, percentageComplete);
+        if (percentageComplete >= 1.0f)
+        {
+            isLerping = false;
+            EndLerp();
+        }
     }
 
     void HandleParticles()
@@ -155,6 +192,12 @@ public class Player : MonoBehaviour
         return Physics.Raycast(transform.position, -transform.up, RAYCAST_LANDING_RANGE, 1 << 9);
     }
 
+    void ResetConstraints()
+    {
+        rb.constraints = RigidbodyConstraints.None;
+        rb.constraints = RigidbodyConstraints.FreezeRotationX |RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezePositionZ;
+    }
+
     public void Land(Vector3 landPosition)
     {
         //transform.position = landPosition; //optional, but it looks weird
@@ -167,12 +210,13 @@ public class Player : MonoBehaviour
         if (landed)
         {
             rb.velocity = Vector3.zero;
-            transform.rotation = Quaternion.identity;
-            rb.freezeRotation = true;
+            StartLerping(Quaternion.identity, 0.5f);
+            //transform.rotation = Quaternion.identity;
+           // rb.freezeRotation = true;
         }
         else
         {
-            rb.freezeRotation = false;
+            ResetConstraints();
         }
     }
 
