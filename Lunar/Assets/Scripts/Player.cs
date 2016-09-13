@@ -5,7 +5,8 @@ using System.Collections;
 /// <summary>
 /// Main controller for the player's ship
 /// </summary>  
-public class Player : MonoBehaviour {
+public class Player : MonoBehaviour
+{
 
     //Keys
     const KeyCode LEFT_KEY = KeyCode.LeftArrow;
@@ -23,6 +24,7 @@ public class Player : MonoBehaviour {
     private const float MAX_FORCE = 10.0f;
     private const float MAX_TORQUE = 1.0f;
     private const float MAX_ANGLE = 25.0f;
+    private const float RAYCAST_LANDING_RANGE = 1.5f;
 
     //Variables
     private Vector2 currentForce = Vector2.zero;
@@ -33,16 +35,15 @@ public class Player : MonoBehaviour {
     private float currentRotation = 0.0f;
     private bool isMovingUpwards = false;
     private bool isRotating = false;
+    private bool landed = false;
 
-
-    //TODO: Limit Z rotation so you can't tip over?
-
+    //TODO: Lerp rotation when you land so it doesn't look so choppy
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-		rb.maxAngularVelocity = 2.0f;
-		rb.maxDepenetrationVelocity = 10.0f;
+        rb.maxAngularVelocity = 2.0f;
+        rb.maxDepenetrationVelocity = 10.0f;
     }
 
     void Update()
@@ -54,20 +55,20 @@ public class Player : MonoBehaviour {
 
     void HandleParticles()
     {
-		if(currentTorque.z > 0 && !fireRight.isPlaying)
+        if (currentTorque.z > 0 && !fireRight.isPlaying)
         {
             fireRight.Play();
         }
-		if(currentTorque.z < 0 && !fireLeft.isPlaying)
+        if (currentTorque.z < 0 && !fireLeft.isPlaying)
         {
             fireLeft.Play();
         }
-		if(currentForce.y > 0 && !fireUp.isPlaying)
+        if (currentForce.y > 0 && !fireUp.isPlaying)
         {
             fireUp.Play();
         }
 
-        if(!isMovingUpwards)
+        if (!isMovingUpwards)
         {
             if (fireUp.isPlaying)
             {
@@ -89,15 +90,16 @@ public class Player : MonoBehaviour {
     {
         if (currentForce != Vector2.zero)
         {
-			rb.AddRelativeForce(currentForce, ForceMode.Acceleration);
+            rb.AddRelativeForce(currentForce, ForceMode.Acceleration);
         }
-        if(currentTorque != Vector3.zero)
+        if (currentTorque != Vector3.zero)
         {
             rb.AddTorque(currentTorque, ForceMode.Force);
         }
-		if(rb.velocity.magnitude > MAX_FORCE) {
-			rb.AddForce(-rb.velocity);
-		}
+        if (rb.velocity.magnitude > MAX_FORCE)
+        {
+            rb.AddForce(-rb.velocity);
+        }
     }
 
     void HandleInput()
@@ -111,7 +113,7 @@ public class Player : MonoBehaviour {
         if (Input.GetKey(RIGHT_KEY))
         {
             currentTorque.z -= turnRate;
-           // currentForce.x += pushRate;
+            // currentForce.x += pushRate;
             isRotating = true;
         }
 
@@ -122,11 +124,11 @@ public class Player : MonoBehaviour {
             currentForce.x = 0;
             isRotating = false;
         }
-     
+
 
         if (Input.GetKey(UP_KEY))
         {
-			currentForce.y += boostRate;
+            currentForce.y += boostRate;
             isMovingUpwards = true;
         }
 
@@ -140,5 +142,42 @@ public class Player : MonoBehaviour {
         currentForce.y = Mathf.Clamp(currentForce.y, -MAX_FORCE, MAX_FORCE);
         currentTorque.z = Mathf.Clamp(currentTorque.z, -MAX_TORQUE, MAX_TORQUE);
 
+    }
+
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawRay(transform.position, -transform.up * RAYCAST_LANDING_RANGE);
+    }
+
+    public bool IsGrounded()
+    {
+        return Physics.Raycast(transform.position, -transform.up, RAYCAST_LANDING_RANGE, 1 << 9);
+    }
+
+    public void Land(Vector3 landPosition)
+    {
+        //transform.position = landPosition; //optional, but it looks weird
+        SetLanded(true);
+    }
+
+    public void SetLanded(bool value)
+    {
+        landed = value;
+        if (landed)
+        {
+            rb.velocity = Vector3.zero;
+            transform.rotation = Quaternion.identity;
+            rb.freezeRotation = true;
+        }
+        else
+        {
+            rb.freezeRotation = false;
+        }
+    }
+
+    public bool HasLanded()
+    {
+        return landed;
     }
 }
