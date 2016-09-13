@@ -41,7 +41,7 @@ public class GameManager : MonoBehaviour {
 		planets[0].distance = 0;
 		planets[0].name = "Earth";
 		planets[0].radius = 300;
-		planets[0].gravity = -9;
+		planets[0].gravity = -4;
 		planets[0].skyParticles = (Material)Resources.Load("Materials/SkyParticle");
 		planets[0].cloudColor = new Color(1,1,1);
 		planets[0].skyParticleColor = new Color(1, 1, 1);
@@ -55,7 +55,7 @@ public class GameManager : MonoBehaviour {
 		planets[1].distance = 1500;
 		planets[1].name = "Mars";
 		planets[1].radius = 500;
-		planets[1].gravity = -6;
+		planets[1].gravity = -2;
 		planets[1].skyParticles = (Material)Resources.Load("Materials/SkyParticle2");
 		planets[1].cloudColor = new Color(0.74f,0.32f,0, 0.7f);
 		planets[1].skyParticleColor = new Color(1, 0, 0);
@@ -74,9 +74,22 @@ public class GameManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		playerHeight = player.transform.position.y;
-		Color temp = backGroundColor.color;
 		if(playerHeight > currentPlanetRadius) {
-			backGroundColor.color = new Color(temp.r, temp.g, temp.b, 1 - ((playerHeight-100)*0.05f));
+			backGroundColor.color = new Color(backGroundColor.color.r, backGroundColor.color.g, backGroundColor.color.b, 1 - ((playerHeight-100)*0.05f));
+			vignette.color = new Color(vignette.color.r, vignette.color.g, vignette.color.b, 1 - ((playerHeight-100)*0.05f));
+			if(clouds.isPlaying) {
+				clouds.Stop();
+			}
+			if(skyParticle.isPlaying) {
+				skyParticle.Stop();
+			}
+		} else {
+			if(!clouds.isPlaying) {
+				clouds.Play();
+			}
+			if(!skyParticle.isPlaying) {
+				skyParticle.Play();
+			}
 		}
 	}
 
