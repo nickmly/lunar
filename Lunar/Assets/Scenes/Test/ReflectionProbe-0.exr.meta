@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: 7164fd95ef59f59469adf104b6313a6a
-timeCreated: 1473786556
-licenseType: Pro
+timeCreated: 1473903513
+licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
     8900000: generatedCubemap
@@ -50,7 +50,6 @@ TextureImporter:
   textureType: 3
   buildTargetSettings: []
   spriteSheet:
-    serializedVersion: 2
     sprites: []
     outline: []
   spritePackingTag: 

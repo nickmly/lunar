@@ -32,15 +32,21 @@ public class GameManager : MonoBehaviour {
 	public Material mountainMaterial;
 	public Player player;
 	public float currentPlanetRadius;
+	public bool cloudsOn;
+	Vector3 cloudsPositionDown;
+	Vector3 cloudsPositionUp;
 
 	// Use this for initialization
 	void Start () {
+		cloudsOn = false;
+		cloudsPositionUp = clouds.transform.position;
+		cloudsPositionDown = new Vector3(clouds.transform.position.x, clouds.transform.position.y-30.0f, clouds.transform.position.z);
 		sP = (ParticleSystemRenderer)skyParticle.GetComponent<Renderer>();
 		cL = (ParticleSystemRenderer)clouds.GetComponent<Renderer>();
 		planets[0] = new Planet();  
 		planets[0].distance = 0;
 		planets[0].name = "Earth";
-		planets[0].radius = 300;
+		planets[0].radius = 100;
 		planets[0].gravity = -4;
 		planets[0].skyParticles = (Material)Resources.Load("Materials/SkyParticle");
 		planets[0].cloudColor = new Color(1,1,1);
@@ -64,7 +70,6 @@ public class GameManager : MonoBehaviour {
 		planets[1].vignetteColor = new Color(0, 0.16f, 0.13f);
 		planets[1].backgroundColor = new Color(1, 0.93f, 0.69f);
 		planets[1].planetSprite = "Earth_1";
-
 	
 
 		UpdatePlanet(0);
@@ -75,20 +80,34 @@ public class GameManager : MonoBehaviour {
 	void Update () {
 		playerHeight = player.transform.position.y;
 		if(playerHeight > currentPlanetRadius) {
-			backGroundColor.color = new Color(backGroundColor.color.r, backGroundColor.color.g, backGroundColor.color.b, 1 - ((playerHeight-100)*0.05f));
+			backGroundColor.color = new Color(backGroundColor.color.r, backGroundColor.color.g, backGroundColor.color.b, 1 - ((playerHeight-currentPlanetRadius)*0.05f));
 			vignette.color = new Color(vignette.color.r, vignette.color.g, vignette.color.b, 1 - ((playerHeight-100)*0.05f));
 			if(clouds.isPlaying) {
 				clouds.Stop();
+				cloudsOn = false;
 			}
 			if(skyParticle.isPlaying) {
 				skyParticle.Stop();
+				cloudsOn = false;
+			}
+		} else if(playerHeight > currentPlanetRadius*0.25f) {
+			if(!cloudsOn) {
+				clouds.Play();
+				skyParticle.Play();
+				cloudsOn = true;
 			}
 		} else {
-			if(!clouds.isPlaying) {
-				clouds.Play();
-			}
-			if(!skyParticle.isPlaying) {
-				skyParticle.Play();
+			clouds.Stop();
+			skyParticle.Stop();
+			cloudsOn = false;
+		}
+
+		if(player.GetComponent<Rigidbody>().velocity.y > 3) {
+			if(clouds.transform.localPosition.y <= 15)
+				clouds.transform.localPosition = new Vector3(clouds.transform.localPosition.x, 15.0f, clouds.transform.localPosition.z);
+		} else if(player.GetComponent<Rigidbody>().velocity.y > -3) {
+			if(clouds.transform.localPosition.y >= -15) {
+				clouds.transform.localPosition = new Vector3(clouds.transform.localPosition.x, -15.0f, clouds.transform.localPosition.z);
 			}
 		}
 	}
@@ -103,5 +122,6 @@ public class GameManager : MonoBehaviour {
 		clouds.startColor = planets[a].cloudColor;
 		planetBackground.material.color = planets[a].groundColor;
 		planet.sprite = (Sprite)Resources.Load<Sprite>("Sprites/"+planets[a].planetSprite);
+		currentPlanetRadius = planets[a].radius;
 	}
 }

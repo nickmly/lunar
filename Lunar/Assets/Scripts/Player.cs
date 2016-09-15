@@ -100,10 +100,10 @@ public class Player : MonoBehaviour
         {
             fireLeft.Play();
         }
-        if (currentForce.y > 0 && !fireUp.isPlaying)
-        {
-            fireUp.Play();
-        }
+		if(currentForce.y > 0) {
+			fireUp.Emit(1);
+		}
+
 
         if (!isMovingUpwards)
         {
