@@ -90,6 +90,12 @@ public class Player : MonoBehaviour
         }
     }
 
+	public void Launch() { 
+
+		currentForce.y += boostRate;
+		isMovingUpwards = true;
+	}
+
     void HandleParticles()
     {
         if (currentTorque.z > 0 && !fireRight.isPlaying)

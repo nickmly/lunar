@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
 	public class Planet {
@@ -35,6 +36,7 @@ public class GameManager : MonoBehaviour {
 	public bool cloudsOn;
 	Vector3 cloudsPositionDown;
 	Vector3 cloudsPositionUp;
+	public Text FPSText;
 
 	// Use this for initialization
 	void Start () {
@@ -78,6 +80,7 @@ public class GameManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		FPSText.text = "FPS: " + 1.0f/Time.deltaTime;
 		playerHeight = player.transform.position.y;
 		if(playerHeight > currentPlanetRadius) {
 			backGroundColor.color = new Color(backGroundColor.color.r, backGroundColor.color.g, backGroundColor.color.b, 1 - ((playerHeight-currentPlanetRadius)*0.05f));
