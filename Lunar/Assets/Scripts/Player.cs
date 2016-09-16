@@ -38,10 +38,15 @@ public class Player : MonoBehaviour
     private bool landed = false;
 
     //Lerping
-    private float timeTakenToLerp,timeStartedLerping;
+    private float timeTakenToLerp, timeStartedLerping;
     private Quaternion lerpStartRot, lerpEndRot;
     private bool isLerping = false;
-    
+
+    //Mobile Vars
+    bool touchLeft = false;
+    bool touchRight = false;
+    bool touchUp = false;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -90,12 +95,6 @@ public class Player : MonoBehaviour
         }
     }
 
-	public void Launch() { 
-
-		currentForce.y += boostRate;
-		isMovingUpwards = true;
-	}
-
     void HandleParticles()
     {
         if (currentTorque.z > 0 && !fireRight.isPlaying)
@@ -106,9 +105,10 @@ public class Player : MonoBehaviour
         {
             fireLeft.Play();
         }
-		if(currentForce.y > 0) {
-			fireUp.Emit(1);
-		}
+        if (currentForce.y > 0)
+        {
+            fireUp.Emit(1);
+        }
 
 
         if (!isMovingUpwards)
@@ -147,13 +147,61 @@ public class Player : MonoBehaviour
 
     void HandleInput()
     {
-        if (Input.GetKey(LEFT_KEY))
+        #region MOBILE
+        bool usingPhone = false;
+        int touchCount = Input.touchCount;
+        if (touchCount > 0)
+        {
+            usingPhone = true;
+            for (int i = 0; i < touchCount; i++)
+            {
+                Touch touch = Input.GetTouch(i);
+                if (touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Stationary)
+                {
+                    if (touch.position.y > Screen.height / 2)
+                    {
+                        if (touch.position.x < Screen.width / 2)
+                        {
+                            touchLeft = true;
+                        }
+                        else if (touch.position.x > Screen.width / 2)
+                        {
+                            touchRight = true;
+                        }
+                    }
+                    else if (touch.position.y < Screen.height / 2)
+                    {
+                        touchUp = true;
+                    }
+                }
+                if (touch.phase == TouchPhase.Ended)
+                {
+                    if (touch.position.x < Screen.width / 2)
+                    {
+                        touchLeft = false;
+                    }
+                    else if (touch.position.x > Screen.width / 2)
+                    {
+                        touchRight = false;
+                    }
+
+                    if (touch.position.y < Screen.height / 2)
+                    {
+                        touchUp = false;
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        if ((Input.GetKey(LEFT_KEY) && !usingPhone) || (touchLeft && usingPhone))
         {
             currentTorque.z += turnRate;
             //currentForce.x -= pushRate;
             isRotating = true;
         }
-        if (Input.GetKey(RIGHT_KEY))
+        else if ((Input.GetKey(RIGHT_KEY) && !usingPhone) || (touchRight && usingPhone))
         {
             currentTorque.z -= turnRate;
             // currentForce.x += pushRate;
@@ -161,7 +209,7 @@ public class Player : MonoBehaviour
         }
 
 
-        if (Input.GetKeyUp(LEFT_KEY) || Input.GetKeyUp(RIGHT_KEY))
+        if (((Input.GetKeyUp(LEFT_KEY) || Input.GetKeyUp(RIGHT_KEY)) && !usingPhone) || ((!touchLeft && !touchRight) && usingPhone))
         {
             currentTorque.z = 0;
             currentForce.x = 0;
@@ -169,13 +217,13 @@ public class Player : MonoBehaviour
         }
 
 
-        if (Input.GetKey(UP_KEY))
+        if ((Input.GetKey(UP_KEY) && !usingPhone) || (touchUp && usingPhone))
         {
             currentForce.y += boostRate;
             isMovingUpwards = true;
         }
 
-        if (Input.GetKeyUp(UP_KEY))
+        if ((Input.GetKeyUp(UP_KEY) && !usingPhone) || (!touchUp && usingPhone))
         {
             currentForce.y = 0;
             isMovingUpwards = false;
@@ -201,7 +249,7 @@ public class Player : MonoBehaviour
     void ResetConstraints()
     {
         rb.constraints = RigidbodyConstraints.None;
-        rb.constraints = RigidbodyConstraints.FreezeRotationX |RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezePositionZ;
+        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezePositionZ;
     }
 
     public void Land(Vector3 landPosition)
@@ -218,7 +266,7 @@ public class Player : MonoBehaviour
             rb.velocity = Vector3.zero;
             StartLerping(Quaternion.identity, 0.5f);
             //transform.rotation = Quaternion.identity;
-           // rb.freezeRotation = true;
+            // rb.freezeRotation = true;
         }
         else
         {
