@@ -9,10 +9,14 @@ ModelImporter:
     100002: Cylinder002
     100004: Cylinder003
     100006: //RootNode
+    100008: Camera
+    100010: Lamp
     400000: Cylinder001
     400002: Cylinder002
     400004: Cylinder003
     400006: //RootNode
+    400008: Camera
+    400010: Lamp
     2300000: Cylinder001
     2300002: Cylinder002
     2300004: Cylinder003
