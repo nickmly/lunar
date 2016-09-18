@@ -4,7 +4,7 @@ using System.Collections;
 public class FollowTarget : MonoBehaviour {
 
     [SerializeField]
-    private Transform target;
+	private GameObject target;
     [SerializeField]
     private Vector3 offset;
 
@@ -16,6 +16,6 @@ public class FollowTarget : MonoBehaviour {
 
 	void Update()
     {
-        transform.position = target.position + offset;
+		transform.position += offset + new Vector3(0.0f, (target.GetComponent<Player>().desiredSpeed * Time.deltaTime), 0.0f);
     }
 }
