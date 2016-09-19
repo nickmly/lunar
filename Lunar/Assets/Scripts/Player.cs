@@ -76,7 +76,6 @@ public class Player : MonoBehaviour
         timeTakenToLerp = lerpTime;
         lerpStartRot = transform.rotation;
         lerpEndRot = endRot;
-
         timeStartedLerping = Time.time;
         isLerping = true;
     }
@@ -137,7 +136,7 @@ public class Player : MonoBehaviour
     {
         if (currentForce != Vector2.zero)
         {
-            rb.AddRelativeForce(currentForce, ForceMode.Acceleration);
+			rb.AddRelativeForce(currentForce, ForceMode.Force);
         }
         if (currentTorque != Vector3.zero)
         {
@@ -147,6 +146,7 @@ public class Player : MonoBehaviour
         {
             rb.AddForce(-rb.velocity);
         }
+
     }
 
     void HandleInput()
@@ -181,13 +181,13 @@ public class Player : MonoBehaviour
 
         #endregion
 #if UNITY_EDITOR
-        if ((Input.GetKey(LEFT_KEY) && !usingPhone))
+		if ((Input.GetKey(LEFT_KEY) && !usingPhone))
         {
             currentTorque.z += turnRate;
             //currentForce.x -= pushRate;
             isRotating = true;
         }
-        else if ((Input.GetKey(RIGHT_KEY) && !usingPhone))
+		else if ((Input.GetKey(RIGHT_KEY) && !usingPhone))
         {
             currentTorque.z -= turnRate;
             // currentForce.x += pushRate;

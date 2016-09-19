@@ -52,10 +52,8 @@ public class GameManager : MonoBehaviour {
 		}
 
 		void SpawnObject() {
-			if(currentSpawnObject == null) {
-				int objectType = Random.Range(0,2);
-				currentSpawnObject = (GameObject)Instantiate(Resources.Load<GameObject>(objectTypes[objectType]), spawnPosition, new Quaternion(0, 0, 0, 0));
-			}
+			int objectType = Random.Range(0,2); //TODO: Make certain coins rare here
+			currentSpawnObject = (GameObject)Instantiate(Resources.Load<GameObject>(objectTypes[objectType]), spawnPosition, new Quaternion(0, 0, 0, 0));
 		}
 
 		public void Update() {

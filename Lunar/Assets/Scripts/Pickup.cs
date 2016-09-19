@@ -5,7 +5,7 @@ public class Pickup : MonoBehaviour {
 
 	public bool pickedUp = false;
 	public BoxCollider bC;
-	public float lifeTime = 5.0f;
+	public float lifeTime = 9.0f;
 	// Use this for initialization
 	void Start () {
 		bC = gameObject.GetComponent<BoxCollider>();
