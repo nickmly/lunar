@@ -16,6 +16,6 @@ public class FollowTarget : MonoBehaviour {
 
 	void Update()
     {
-		transform.position += offset + new Vector3(0.0f, (target.GetComponent<Player>().desiredSpeed * Time.deltaTime), 0.0f);
+        transform.position = target.transform.position + offset;// + new Vector3(0.0f, (target.GetComponent<Player>().desiredSpeed * Time.deltaTime), 0.0f);
     }
 }

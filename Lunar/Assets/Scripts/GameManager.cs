@@ -100,6 +100,7 @@ public class GameManager : MonoBehaviour {
 	public Vector3[] SideSpawns = new Vector3[6];
 	public Vector3[] TopSpawns = new Vector3[5];
 	public float FPS;
+    public Text fpsCounter, accelCounter;
 
 
 	// Use this for initialization
@@ -129,7 +130,8 @@ public class GameManager : MonoBehaviour {
 	void Update () {
 		UpdateSpawnPositions();
 		FPS = 1/Time.deltaTime;
-		GameObject.Find("FPS").GetComponent<Text>().text = "FPS: " + FPS;
+		fpsCounter.text = "FPS: " + FPS;
+        accelCounter.text = "A: " + Input.acceleration.x;
 		if(Input.GetKeyDown(KeyCode.S)) {
 			InitiateSpawn();
 		}
