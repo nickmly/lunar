@@ -136,11 +136,12 @@ public class Player : MonoBehaviour
     {
         if (currentForce != Vector2.zero)
         {
-			rb.AddRelativeForce(currentForce, ForceMode.Force);
+            rb.AddRelativeForce(currentForce, ForceMode.Force);
         }
         if (currentTorque != Vector3.zero)
         {
-            transform.Rotate(currentTorque);
+            rb.AddTorque(currentTorque, ForceMode.Force);
+            //transform.Rotate(currentTorque);
         }
         if (rb.velocity.magnitude > MAX_FORCE)
         {
@@ -154,7 +155,7 @@ public class Player : MonoBehaviour
         #region MOBILE
         bool usingPhone = false;
         int touchCount = Input.touchCount;
-      
+
         if (touchCount > 0)
         {
             usingPhone = true;
@@ -181,13 +182,13 @@ public class Player : MonoBehaviour
 
         #endregion
 #if UNITY_EDITOR
-		if ((Input.GetKey(LEFT_KEY) && !usingPhone))
+        if ((Input.GetKey(LEFT_KEY) && !usingPhone))
         {
             currentTorque.z += turnRate;
             //currentForce.x -= pushRate;
             isRotating = true;
         }
-		else if ((Input.GetKey(RIGHT_KEY) && !usingPhone))
+        else if ((Input.GetKey(RIGHT_KEY) && !usingPhone))
         {
             currentTorque.z -= turnRate;
             // currentForce.x += pushRate;
@@ -196,6 +197,7 @@ public class Player : MonoBehaviour
 
         if (((Input.GetKeyUp(LEFT_KEY) || Input.GetKeyUp(RIGHT_KEY)) && !usingPhone))
         {
+            rb.angularVelocity = Vector3.zero;
             currentTorque.z = 0;
             currentForce.x = 0;
             isRotating = false;
@@ -209,7 +211,7 @@ public class Player : MonoBehaviour
 
 #if UNITY_ANDROID && !UNITY_EDITOR
         currentTorque.z += turnRate * -Input.acceleration.x;
-        if (Mathf.Abs(Input.acceleration.x) > 0.1f)
+        if (Mathf.Abs(Input.acceleration.x) > 0.07f)
         {
             isRotating = true;
         }
@@ -217,6 +219,7 @@ public class Player : MonoBehaviour
         {
             isRotating = false;
             currentTorque = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
         }
 #endif
         if ((Input.GetKey(UP_KEY) && !usingPhone) || (touchUp && usingPhone))
