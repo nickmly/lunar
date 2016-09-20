@@ -149,6 +149,10 @@ public class Player : MonoBehaviour
 
     }
 
+	public void Boost(float boostPower) {
+		rb.AddRelativeForce(new Vector3(0.0f, boostPower, 0.0f), ForceMode.VelocityChange);
+	}
+
     void HandleInput()
     {
         #region MOBILE

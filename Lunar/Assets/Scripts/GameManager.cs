@@ -4,86 +4,6 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
 
-	public class TableAttribute {
-		public GameObject currentSpawnObject;
-		public float rateOfSpawn = 2.0f; //Seconds per spawn
-		public float currentRate = 0.0f;
-		public bool startSpawn = false;
-	}
-
-	public class Row : TableAttribute {
-		public Vector3[] spawnPosition = new Vector3[2];
-		public string[] objectTypes = new string[3];
-
-		public void UpdateRowPositions(Vector3 spawnPositionOne, Vector3 spawnPositionTwo) {
-			spawnPosition[0] = spawnPositionOne;
-			spawnPosition[1] = spawnPositionTwo;
-		}
-
-		void SpawnObject() {
-			if(currentSpawnObject == null) {
-				int a = Random.Range(0,2);
-				int objectType = Random.Range(0,3);
-				if(a==0) {
-					currentSpawnObject = (GameObject)Instantiate(Resources.Load<GameObject>(objectTypes[objectType]), spawnPosition[0], new Quaternion(0.5f, -0.5f, -0.5f, -0.5f));
-				} else {
-					currentSpawnObject = (GameObject)Instantiate(Resources.Load<GameObject>(objectTypes[objectType]), spawnPosition[1], new Quaternion(0.5f, 0.5f, 0.5f, -0.5f));
-				}
-			}
-		}
-
-		public void Update() {
-			if(startSpawn == true) {
-				currentRate += Time.deltaTime;
-				if(currentRate > rateOfSpawn) {
-					SpawnObject();
-					currentRate = 0.0f;
-				}
-			}
-		}
-	};
-
-	public class Column : TableAttribute {
-		public Vector3 spawnPosition = new Vector3();
-		public string[] objectTypes = new string[2];
-
-		public void UpdateRowPositions(Vector3 spawnPositionOne) {
-			spawnPosition = spawnPositionOne;
-		}
-
-		void SpawnObject() {
-			int objectType = Random.Range(0,2); //TODO: Make certain coins rare here
-			currentSpawnObject = (GameObject)Instantiate(Resources.Load<GameObject>(objectTypes[objectType]), spawnPosition, new Quaternion(0, 0, 0, 0));
-		}
-
-		public void Update() {
-			if(startSpawn == true) {
-				currentRate += Time.deltaTime;
-				if(currentRate > rateOfSpawn) {
-					SpawnObject();
-					currentRate = 0.0f;
-				}
-			}
-		}
-
-	}
-
-	public class EnemyRow : Row {
-		public EnemyRow(float _rateOfSpawn) {
-			rateOfSpawn = _rateOfSpawn;
-			objectTypes[0] = "Prefabs/Geese";
-			objectTypes[1] = "Prefabs/Airplane";
-			objectTypes[2] = "Prefabs/UFO";
-		}
-	}
-
-	public class PickUpColumn : Column {
-		public PickUpColumn(float _rateOfSpawn) {
-			rateOfSpawn = _rateOfSpawn;
-			objectTypes[0] = "Prefabs/Coin1";
-			objectTypes[1] = "Prefabs/Coin2";
-		}
-	}
 
 	public EnemyRow rowOne;
 	public EnemyRow rowTwo;
@@ -106,11 +26,11 @@ public class GameManager : MonoBehaviour {
 		rowOne = new EnemyRow(4.0f);
 		rowTwo = new EnemyRow(2.0f);
 		rowThree = new EnemyRow(1.0f);
-		columnOne = new PickUpColumn(1.0f);
-		columnTwo = new PickUpColumn(2.0f);
-		columnThree = new PickUpColumn(4.0f);
-		columnFour = new PickUpColumn(2.0f);
-		columnFive = new PickUpColumn(1.0f);
+		columnOne = new PickUpColumn(5.0f);
+		columnTwo = new PickUpColumn(13.0f);
+		columnThree = new PickUpColumn(11.0f);
+		columnFour = new PickUpColumn(7.0f);
+		columnFive = new PickUpColumn(3.0f);
 		UpdateSpawnPositions();
 	}
 
@@ -161,4 +81,100 @@ public class GameManager : MonoBehaviour {
 		columnFive.UpdateRowPositions(TopSpawns[4]);
 
 	}
+
+
+
+	#region TABLEDEFINITION
+	public class TableAttribute {
+		public GameObject currentSpawnObject;
+		public float rateOfSpawn = 2.0f; //Seconds per spawn
+		public float currentRate = 0.0f;
+		public bool startSpawn = false;
+	}
+
+	public class Row : TableAttribute {
+		public Vector3[] spawnPosition = new Vector3[2];
+		public string[] objectTypes = new string[3];
+
+		public void UpdateRowPositions(Vector3 spawnPositionOne, Vector3 spawnPositionTwo) {
+			spawnPosition[0] = spawnPositionOne;
+			spawnPosition[1] = spawnPositionTwo;
+		}
+
+		void SpawnObject() {
+			if(currentSpawnObject == null) {
+				int a = Random.Range(0,2);
+				int objectType = Random.Range(0,3);
+				if(a==0) {
+					currentSpawnObject = (GameObject)Instantiate(Resources.Load<GameObject>(objectTypes[objectType]), spawnPosition[0], new Quaternion(0.5f, -0.5f, -0.5f, -0.5f));
+				} else {
+					currentSpawnObject = (GameObject)Instantiate(Resources.Load<GameObject>(objectTypes[objectType]), spawnPosition[1], new Quaternion(0.5f, 0.5f, 0.5f, -0.5f));
+				}
+			}
+		}
+
+		public void Update() {
+			if(startSpawn == true) {
+				currentRate += Time.deltaTime;
+				if(currentRate > rateOfSpawn) {
+					SpawnObject();
+					currentRate = 0.0f;
+				}
+			}
+		}
+	};
+
+	public class Column : TableAttribute {
+		public Vector3 spawnPosition = new Vector3();
+		public string[] objectTypes = new string[3];
+
+		public void UpdateRowPositions(Vector3 spawnPositionOne) {
+			spawnPosition = spawnPositionOne;
+		}
+
+		void SpawnObject() {
+			int count = Random.Range(0,101); //TODO: Make certain pickups rare here
+			int objectType = 0;
+			if(count%2 == 0) {
+				objectType = 0;
+			} else if(count%3 == 0) {
+				objectType = 1;
+			} else if(count%7 == 0) {
+				objectType = 2;
+			} else {
+				objectType = 0;
+			}//CONTINUE TO ADD OBJECTS HERE. THE HIGHER THE REMAINDER, THE RARER THE OBJECT
+			currentSpawnObject = (GameObject)Instantiate(Resources.Load<GameObject>(objectTypes[objectType]), spawnPosition, new Quaternion(0, 0, 0, 0));
+		}
+
+		public void Update() {
+			if(startSpawn == true) {
+				currentRate += Time.deltaTime;
+				if(currentRate > rateOfSpawn) {
+					SpawnObject();
+					currentRate = 0.0f;
+				}
+			}
+		}
+
+	}
+
+	public class EnemyRow : Row {
+		public EnemyRow(float _rateOfSpawn) {
+			rateOfSpawn = _rateOfSpawn;
+			objectTypes[0] = "Prefabs/Geese";
+			objectTypes[1] = "Prefabs/Airplane";
+			objectTypes[2] = "Prefabs/UFO";
+		}
+	}
+
+	public class PickUpColumn : Column {
+		public PickUpColumn(float _rateOfSpawn) {
+			rateOfSpawn = _rateOfSpawn;
+			objectTypes[0] = "Prefabs/Coin1";
+			objectTypes[1] = "Prefabs/Coin2";
+			objectTypes[2] = "Prefabs/HoopHolder";
+		}
+	}
+	#endregion
 }
