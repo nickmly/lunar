@@ -140,8 +140,7 @@ public class Player : MonoBehaviour
         }
         if (currentTorque != Vector3.zero)
         {
-            rb.AddTorque(currentTorque, ForceMode.Force);
-            //transform.Rotate(currentTorque);
+            transform.Rotate(currentTorque);
         }
         if (rb.velocity.magnitude > MAX_FORCE)
         {

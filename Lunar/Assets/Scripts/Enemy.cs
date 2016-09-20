@@ -31,15 +31,17 @@ public class Enemy : MonoBehaviour {
 	}
 
 	void Border() {
-		if(transform.position.x > target.x + 13.0f) {
+		if(transform.position.x > target.x + 25.0f) {
 			Destroy(gameObject);
-		} else if(transform.position.x < target.x -13.0f) {
+		} else if(transform.position.x < target.x -25.0f) {
 			Destroy(gameObject);
 		}
 	}
 	void OnTriggerEnter(Collider other) {
 		if(other.tag == "Player") {
 			Debug.Log("Hit");
+		} else if(other.tag == "Land") {
+			Destroy(gameObject);
 		}
 	}
 }
