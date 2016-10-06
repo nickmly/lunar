@@ -49,7 +49,7 @@ public class GameManager : MonoBehaviour {
 		UpdateSpawnPositions();
 		FPS = 1/Time.deltaTime;
 		fpsCounter.text = "FPS: " + FPS;
-        accelCounter.text = "A: " + Input.acceleration.x;
+//        accelCounter.text = "A: " + Input.acceleration.x;
 		if(Input.GetKeyDown(KeyCode.S)) {
 			InitiateSpawn();
 		}
