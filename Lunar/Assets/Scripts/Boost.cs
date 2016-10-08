@@ -4,6 +4,7 @@ using System.Collections;
 public class Boost : MonoBehaviour {
 
 	public float boostPower = 25.0f;
+
 	void Start() {
 		boostPower = 25.0f;
 	}

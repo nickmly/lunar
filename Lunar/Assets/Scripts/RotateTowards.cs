@@ -17,13 +17,15 @@ public class RotateTowards : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		target = t.position;
-		current = c.position;
-		distance = Vector3.Distance(target, current);
-		theta = (Mathf.Atan2((target-current).y, (target-current).x) * Mathf.Rad2Deg);
-		Debug.Log(theta*Mathf.Rad2Deg);
-		self.rotation = Quaternion.Euler(0.0f, 0.0f, theta-90);
-		distanceText.text = ((int)distance).ToString();
-
+		if(t != null) {
+			target = t.position;
+			current = c.position;
+			distance = Vector3.Distance(target, current);
+			theta = (Mathf.Atan2((target-current).y, (target-current).x) * Mathf.Rad2Deg);
+			self.rotation = Quaternion.Euler(0.0f, 0.0f, theta-90);
+			distanceText.text = ((int)distance).ToString();
+		} else {
+			distanceText.text = "No Platform";
+		}
 	}
 }

@@ -29,11 +29,15 @@ public class Pickup : MonoBehaviour {
 
 	void PickUp() {
 		pickedUp = false;
+
 		Destroy(gameObject);
 	}
 
 	void OnTriggerEnter(Collider other) {
 		if(other.tag == "Player") {
+			GameObject coinSplash = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/CoinSplash"));
+			coinSplash.transform.position = transform.position;
+			Debug.Log(coinSplash);
 			PickUp();
 		}
 	}

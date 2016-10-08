@@ -37,6 +37,9 @@ public class Player : MonoBehaviour
     private bool isMovingUpwards = false;
     private bool isRotating = false;
     private bool landed = false;
+	[SerializeField]private float currentFuel;
+	[SerializeField]private float fuelTank;
+	[SerializeField]GameManager gM;
 
     //Lerping
     private float timeTakenToLerp, timeStartedLerping;
@@ -242,6 +245,13 @@ public class Player : MonoBehaviour
         currentTorque.z = Mathf.Clamp(currentTorque.z, -MAX_TORQUE, MAX_TORQUE);
 
     }
+
+	void OnCollisionEnter(Collision col) {
+		if(col.gameObject.tag == "Land" && col.gameObject.name.Contains("Land")) {
+			Debug.Log("Landed");
+			gM.LandedOnPlatform(col.gameObject);
+		}
+	}
 
     void OnDrawGizmos()
     {

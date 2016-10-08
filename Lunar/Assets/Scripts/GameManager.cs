@@ -4,7 +4,6 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
 
-
 	public EnemyRow rowOne;
 	public EnemyRow rowTwo;
 	public EnemyRow rowThree;
@@ -20,9 +19,17 @@ public class GameManager : MonoBehaviour {
 	public float FPS;
     public Text fpsCounter, accelCounter;
 
+	public GameObject[] platforms = new GameObject[3];
+	Vector3 nextPlatformPosition = new Vector3(20.0f, 100.0f, 0.0f);
+	public float currentPlatform = 0;
 
 	// Use this for initialization
 	void Start () {
+		
+		platforms[0] = GameObject.FindGameObjectWithTag("Land");
+		platforms[1] = (GameObject)Instantiate(Resources.Load("Prefabs/Land"),platforms[0].transform.position+nextPlatformPosition, Quaternion.Euler(-90.0f,0.0f,0.0f));
+		GameObject.FindObjectOfType<RotateTowards>().t = platforms[1].transform;
+			
 		rowOne = new EnemyRow(4.0f);
 		rowTwo = new EnemyRow(2.0f);
 		rowThree = new EnemyRow(1.0f);
@@ -34,15 +41,25 @@ public class GameManager : MonoBehaviour {
 		UpdateSpawnPositions();
 	}
 
-	public void InitiateSpawn() {
-		rowOne.startSpawn = true;
-		rowTwo.startSpawn = true;
-		rowThree.startSpawn = true;
-		columnOne.startSpawn = true;
-		columnTwo.startSpawn = true;
-		columnThree.startSpawn = true;
-		columnFour.startSpawn = true;
-		columnFive.startSpawn = true;
+	public void LandedOnPlatform(GameObject plat) {
+		if(plat == platforms[1]) {
+			GameObject.Destroy(platforms[0].gameObject);
+			platforms[0] = platforms[1];
+			platforms[1] = (GameObject)Instantiate(Resources.Load("Prefabs/Land"),platforms[0].transform.position+nextPlatformPosition, Quaternion.Euler(-90.0f,0.0f,0.0f));
+			currentPlatform++;
+			GameObject.FindObjectOfType<RotateTowards>().t = platforms[1].transform;
+		}
+	}
+
+	public void InitiateSpawn(bool x) {
+		rowOne.startSpawn = x;
+		rowTwo.startSpawn = x;
+		rowThree.startSpawn = x;
+		columnOne.startSpawn = x;
+		columnTwo.startSpawn = x;
+		columnThree.startSpawn = x;
+		columnFour.startSpawn = x;
+		columnFive.startSpawn = x;
 	}
 	// Update is called once per frame
 	void Update () {
@@ -51,7 +68,7 @@ public class GameManager : MonoBehaviour {
 		fpsCounter.text = "FPS: " + FPS;
 //        accelCounter.text = "A: " + Input.acceleration.x;
 		if(Input.GetKeyDown(KeyCode.S)) {
-			InitiateSpawn();
+			InitiateSpawn(true);
 		}
 		rowOne.Update();
 		rowTwo.Update();
