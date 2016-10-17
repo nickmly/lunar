@@ -1,24 +1,25 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class Pickup : MonoBehaviour {
 
 	public bool pickedUp = false;
 	public BoxCollider bC;
-	public float lifeTime = 9.0f;
+	public HUD hud;
+	public Text coinCount;
+	public int value;
+
 	// Use this for initialization
 	void Start () {
 		bC = gameObject.GetComponent<BoxCollider>();
+		coinCount = GameObject.Find("CoinText").GetComponent<Text>();
+		hud = GameObject.FindObjectOfType<HUD>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		Rotate();
-		if(lifeTime > 0) {
-		lifeTime -=Time.deltaTime;
-		} else {
-			Destroy(gameObject);
-		}
 	}
 
 	void Rotate(){
@@ -29,15 +30,13 @@ public class Pickup : MonoBehaviour {
 
 	void PickUp() {
 		pickedUp = false;
-
 		Destroy(gameObject);
 	}
 
 	void OnTriggerEnter(Collider other) {
 		if(other.tag == "Player") {
-			GameObject coinSplash = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/CoinSplash"));
-			coinSplash.transform.position = transform.position;
-			Debug.Log(coinSplash);
+			GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/CoinSplash"), transform.position, Quaternion.Euler(0.0f, 0.0f, 0.0f));
+			hud.updateCoinText(value);
 			PickUp();
 		}
 	}

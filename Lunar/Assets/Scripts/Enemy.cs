@@ -4,17 +4,21 @@ using System.Collections;
 public class Enemy : MonoBehaviour {
 	public Vector3 speed;
 	public bool movingRight;
-	public float multiplier = 10.0f;
+	public float multiplier;
 	public Vector3 target;
+	public int coinAttack;
+	public int fuelAttack;
 	//TO DO: Add dying mechanisms
 	// Use this for initialization
 	void Start () {
 		target = GameObject.FindGameObjectWithTag("Player").transform.position;
-		multiplier = 3.0f;
+		float randomness = 1.007f;
+		randomness = Mathf.Pow(randomness, GameObject.FindObjectOfType<Player>().platformsLanded);
+
 		if(transform.position.x > target.x) {
-			speed.x = multiplier * (Random.Range(-1,-3));
+			speed.x = multiplier * (Random.Range(-randomness,-randomness-3.0f));
 		} else {
-			speed.x = multiplier * (Random.Range(1,3));
+			speed.x = multiplier * (Random.Range(randomness,randomness+3.0f));
 		}
 	}
 
@@ -40,6 +44,8 @@ public class Enemy : MonoBehaviour {
 	void OnTriggerEnter(Collider other) {
 		if(other.tag == "Player") {
 			Debug.Log("Hit");
+			other.GetComponent<Player>().PlayerHit(coinAttack, fuelAttack);
+			Destroy(gameObject);
 		} else if(other.tag == "Land") {
 			Destroy(gameObject);
 		}

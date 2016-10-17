@@ -10,23 +10,28 @@ ModelImporter:
     100004: Right_Thruster
     100006: //RootNode
     100008: Top
+    100010: Bottom
     400000: Body
     400002: Left_Thruster
     400004: Right_Thruster
     400006: //RootNode
     400008: Top
+    400010: Bottom
     2300000: Body
     2300002: Left_Thruster
     2300004: Right_Thruster
     2300006: Top
+    2300008: Bottom
     3300000: Body
     3300002: Left_Thruster
     3300004: Right_Thruster
     3300006: Top
+    3300008: Bottom
     4300000: Body
     4300002: Top
     4300004: Right_Thruster
     4300006: Left_Thruster
+    4300008: Bottom
     9500000: //RootNode
   materials:
     importMaterials: 0

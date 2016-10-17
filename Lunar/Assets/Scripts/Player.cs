@@ -22,29 +22,35 @@ public class Player : MonoBehaviour
     private ParticleSystem fireUp, fireLeft, fireRight;
 
     //Constant Variables
-    private const float MAX_FORCE = 10.0f;
-    private const float MAX_TORQUE = 1.0f;
-    private const float MAX_ANGLE = 25.0f;
-    private const float RAYCAST_LANDING_RANGE = 1.05f;
+    public float MAX_FORCE = 10.0f;
+	public float MAX_TORQUE = 1.0f;
+	public float MAX_ANGLE = 25.0f;
+	private const float RAYCAST_LANDING_RANGE = 1.05f;
 
     //Variables
-    private Vector2 currentForce = Vector2.zero;
-    private Vector3 currentTorque = Vector3.zero;
-    private float pushRate = 0.05f;
-    private float turnRate = 0.085f;
-    private float boostRate = 0.85f;
+    public Vector2 currentForce = Vector2.zero;
+    public Vector3 currentTorque = Vector3.zero;
+	public float pushRate = 0.05f;
+	public float turnRate = 0.085f;
+	public float boostRate = 0.15f;
     private float currentRotation = 0.0f;
     private bool isMovingUpwards = false;
     private bool isRotating = false;
     private bool landed = false;
-	[SerializeField]private float currentFuel;
+	[SerializeField]public float currentFuel;
 	[SerializeField]private float fuelTank;
 	[SerializeField]GameManager gM;
+	public float currentCoins;
+	public float platformsLanded;
+	public float hitTimer = 0.0f;
+	public bool playerHit = false;
 
     //Lerping
     private float timeTakenToLerp, timeStartedLerping;
     private Quaternion lerpStartRot, lerpEndRot;
     private bool isLerping = false;
+	MeshRenderer[] mat;
+
 
     //Mobile Vars
     bool touchUp = false;
@@ -54,6 +60,7 @@ public class Player : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.maxAngularVelocity = 2.0f;
         rb.maxDepenetrationVelocity = 10.0f;
+		mat =  GetComponentsInChildren<MeshRenderer>();
     }
 
     void Update()
@@ -64,6 +71,13 @@ public class Player : MonoBehaviour
         }
 
         HandleParticles();
+
+		if(Input.GetKeyDown(KeyCode.K)) {
+			PlayerHit(10, 10);
+		}
+
+		PlayerRecover(playerHit);
+
     }
 
     void FixedUpdate()
@@ -72,33 +86,6 @@ public class Player : MonoBehaviour
             Lerp();
         else
             HandleMovement();
-    }
-
-    void StartLerping(Quaternion endRot, float lerpTime)
-    {
-        timeTakenToLerp = lerpTime;
-        lerpStartRot = transform.rotation;
-        lerpEndRot = endRot;
-        timeStartedLerping = Time.time;
-        isLerping = true;
-    }
-
-
-    void EndLerp()
-    {
-        rb.freezeRotation = true;
-    }
-
-    void Lerp()
-    {
-        float timeSinceStarted = Time.time - timeStartedLerping;
-        float percentageComplete = timeSinceStarted / timeTakenToLerp;
-        transform.rotation = Quaternion.Lerp(lerpStartRot, lerpEndRot, percentageComplete);
-        if (percentageComplete >= 1.0f)
-        {
-            isLerping = false;
-            EndLerp();
-        }
     }
 
     void HandleParticles()
@@ -111,11 +98,10 @@ public class Player : MonoBehaviour
         {
             fireLeft.Play();
         }
-        if (currentForce.y > 0)
+		if (currentForce.y > 0 && currentFuel > 0)
         {
             fireUp.Emit(1);
         }
-
 
         if (!isMovingUpwards)
         {
@@ -124,6 +110,7 @@ public class Player : MonoBehaviour
                 fireUp.Stop();
             }
         }
+
         if (!isRotating)
         {
             if (fireRight.isPlaying || fireLeft.isPlaying)
@@ -137,9 +124,10 @@ public class Player : MonoBehaviour
 
     void HandleMovement()
     {
-        if (currentForce != Vector2.zero)
+		if (currentForce != Vector2.zero && currentFuel > 0)
         {
-            rb.AddRelativeForce(currentForce, ForceMode.Force);
+			rb.AddRelativeForce(currentForce, ForceMode.Acceleration);
+			currentFuel -= Time.deltaTime;
         }
         if (currentTorque != Vector3.zero)
         {
@@ -197,7 +185,7 @@ public class Player : MonoBehaviour
         else if ((Input.GetKey(RIGHT_KEY) && !usingPhone))
         {
             currentTorque.z -= turnRate;
-            // currentForce.x += pushRate;
+           // currentForce.x += pushRate;
             isRotating = true;
         }
 
@@ -248,8 +236,64 @@ public class Player : MonoBehaviour
 
 	void OnCollisionEnter(Collision col) {
 		if(col.gameObject.tag == "Land" && col.gameObject.name.Contains("Land")) {
-			Debug.Log("Landed");
 			gM.LandedOnPlatform(col.gameObject);
+		} 
+	}
+
+	void OnCollisionStay(Collision col) {
+		if(col.gameObject.tag == "Land" && col.gameObject.name.Contains("Land")) {
+			if(currentFuel < fuelTank) {
+				currentFuel += Mathf.Pow(Time.deltaTime, 0.2f);
+			}
+		}
+	}
+
+	void PlayerRecover(bool a) {
+		if(a) {
+			if(hitTimer < 3.0f) {
+				hitTimer += Time.deltaTime;
+			} else {
+				playerHit = false;
+			}
+		}
+	}
+
+	public void PlayerHit(int coinLoss, int fuelLoss) {
+		//Here, player will lose fuel and coins. Sucks!
+		playerHit = true;
+		hitTimer = 0.0f;
+		if(currentFuel >= fuelLoss) {
+			currentFuel -= fuelLoss;
+		}
+		gM.PlayerHit(coinLoss);
+	}
+
+	#region idk
+
+	void StartLerping(Quaternion endRot, float lerpTime)
+	{
+		timeTakenToLerp = lerpTime;
+		lerpStartRot = transform.rotation;
+		lerpEndRot = endRot;
+		timeStartedLerping = Time.time;
+		isLerping = true;
+	}
+
+
+	void EndLerp()
+	{
+		rb.freezeRotation = true;
+	}
+
+	void Lerp()
+	{
+		float timeSinceStarted = Time.time - timeStartedLerping;
+		float percentageComplete = timeSinceStarted / timeTakenToLerp;
+		transform.rotation = Quaternion.Lerp(lerpStartRot, lerpEndRot, percentageComplete);
+		if (percentageComplete >= 1.0f)
+		{
+			isLerping = false;
+			EndLerp();
 		}
 	}
 
@@ -296,6 +340,7 @@ public class Player : MonoBehaviour
     {
         return landed;
     }
+	#endregion
 }
 
 

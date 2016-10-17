@@ -18,37 +18,49 @@ public class GameManager : MonoBehaviour {
 	public Vector3[] TopSpawns = new Vector3[5];
 	public float FPS;
     public Text fpsCounter, accelCounter;
+	public HUD hud;
+
+	public float enemyRateOfSpawn;
+	public float coinRateOfSpawn;
+	public float difficultyMultiplier = 0.99f;
 
 	public GameObject[] platforms = new GameObject[3];
 	Vector3 nextPlatformPosition = new Vector3(20.0f, 100.0f, 0.0f);
-	public float currentPlatform = 0;
+	public Player player;
 
 	// Use this for initialization
 	void Start () {
-		
-		platforms[0] = GameObject.FindGameObjectWithTag("Land");
+		player = GameObject.FindObjectOfType<Player>();
+		hud = GameObject.FindObjectOfType<HUD>();
+		platforms[0] = GameObject.Find("Land");
 		platforms[1] = (GameObject)Instantiate(Resources.Load("Prefabs/Land"),platforms[0].transform.position+nextPlatformPosition, Quaternion.Euler(-90.0f,0.0f,0.0f));
 		GameObject.FindObjectOfType<RotateTowards>().t = platforms[1].transform;
-			
-		rowOne = new EnemyRow(4.0f);
-		rowTwo = new EnemyRow(2.0f);
-		rowThree = new EnemyRow(1.0f);
-		columnOne = new PickUpColumn(5.0f);
-		columnTwo = new PickUpColumn(13.0f);
-		columnThree = new PickUpColumn(11.0f);
-		columnFour = new PickUpColumn(7.0f);
-		columnFive = new PickUpColumn(3.0f);
+		rowOne = new EnemyRow(enemyRateOfSpawn);
+		rowTwo = new EnemyRow(enemyRateOfSpawn+Random.Range(0, 2));
+		rowThree = new EnemyRow(enemyRateOfSpawn+Random.Range(0, 4));
+		columnOne = new PickUpColumn(Random.Range(3, 5));
+		columnTwo = new PickUpColumn(Random.Range(2, 6));
+		columnThree = new PickUpColumn(Random.Range(2, 5)); 
+		columnFour = new PickUpColumn(Random.Range(4, 4));
+		columnFive = new PickUpColumn(Random.Range(5, 7));
 		UpdateSpawnPositions();
 	}
 
 	public void LandedOnPlatform(GameObject plat) {
 		if(plat == platforms[1]) {
+			hud.updateCoinText(100);
 			GameObject.Destroy(platforms[0].gameObject);
 			platforms[0] = platforms[1];
 			platforms[1] = (GameObject)Instantiate(Resources.Load("Prefabs/Land"),platforms[0].transform.position+nextPlatformPosition, Quaternion.Euler(-90.0f,0.0f,0.0f));
-			currentPlatform++;
+			player.platformsLanded++;
 			GameObject.FindObjectOfType<RotateTowards>().t = platforms[1].transform;
+			coinRateOfSpawn = 3 * Mathf.Pow(difficultyMultiplier, player.platformsLanded);
+			enemyRateOfSpawn = 5 * Mathf.Pow(difficultyMultiplier, player.platformsLanded);
 		}
+	}
+
+	public void PlayerHit(int attack) {
+		hud.updateCoinText(-attack);
 	}
 
 	public void InitiateSpawn(bool x) {
@@ -67,9 +79,7 @@ public class GameManager : MonoBehaviour {
 		FPS = 1/Time.deltaTime;
 		fpsCounter.text = "FPS: " + FPS;
 //        accelCounter.text = "A: " + Input.acceleration.x;
-		if(Input.GetKeyDown(KeyCode.S)) {
-			InitiateSpawn(true);
-		}
+		InitiateSpawn(true);
 		rowOne.Update();
 		rowTwo.Update();
 		rowThree.Update();
@@ -98,6 +108,9 @@ public class GameManager : MonoBehaviour {
 		columnFive.UpdateRowPositions(TopSpawns[4]);
 
 	}
+
+
+
 
 
 
@@ -143,7 +156,7 @@ public class GameManager : MonoBehaviour {
 
 	public class Column : TableAttribute {
 		public Vector3 spawnPosition = new Vector3();
-		public string[] objectTypes = new string[3];
+		public string[] objectTypes = new string[4];
 
 		public void UpdateRowPositions(Vector3 spawnPositionOne) {
 			spawnPosition = spawnPositionOne;
@@ -158,6 +171,8 @@ public class GameManager : MonoBehaviour {
 				objectType = 1;
 			} else if(count%7 == 0) {
 				objectType = 2;
+			} else if(count%11 == 0) {
+				objectType = 3;
 			} else {
 				objectType = 0;
 			}//CONTINUE TO ADD OBJECTS HERE. THE HIGHER THE REMAINDER, THE RARER THE OBJECT
@@ -191,6 +206,7 @@ public class GameManager : MonoBehaviour {
 			objectTypes[0] = "Prefabs/Coin1";
 			objectTypes[1] = "Prefabs/Coin2";
 			objectTypes[2] = "Prefabs/HoopHolder";
+			objectTypes[3] = "Prefabs/GemHolder";
 		}
 	}
 	#endregion
